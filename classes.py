@@ -47,7 +47,6 @@ class Ball(pygame.Rect):
         self.check_hitball(paddles[0], paddles[1])
         self.check_edge_collision()
 
-
     def check_edge_collision(self):
         if (self.x - LINETHICKNESS / 2 <= 0 and self.dir_x < 0) or (self.x + LINETHICKNESS/2 >= WINDOWWIDTH and self.dir_x > 0):
             self.dir_x *= -1
@@ -56,19 +55,22 @@ class Ball(pygame.Rect):
 
     def check_hitball(self, paddle1, paddle2):
         vector = 1
-        if self.dir_x < 0 and paddle1.right == self.left and paddle1.top < self.top and paddle1.bottom > self.bottom:
-            pygame.event.post(e1)
-            paddle1.score += 1
-            vector = -1
-        elif self.x - LINETHICKNESS / 2 <= 0:
-            paddle1.score -= 1 if paddle1.score else 0
         
-        if self.dir_x > 0 and paddle2.left == self.right and paddle2.top < self.top and paddle2.bottom > self.bottom:
-            pygame.event.post(e2)
-            paddle2.score += 1
-            vector = -1
-        elif self.x + LINETHICKNESS/2 >= WINDOWWIDTH:
-            paddle2.score -= 1 if paddle2.score else 0
+        if self.dir_x < 0:
+            if abs(paddle1.right - self.left) <= 1.5 and paddle1.top <= self.top and paddle1.bottom >= self.bottom:
+                pygame.event.post(e1)
+                paddle1.score += 1
+                vector = -1
+            elif self.x - LINETHICKNESS / 2 <= 0:
+                paddle1.score -= 1 if paddle1.score else 0
+        
+        if self.dir_x > 0:
+            if abs(paddle2.left - self.right) <= 1.5 and paddle2.top <= self.top and paddle2.bottom >= self.bottom:
+                pygame.event.post(e2)
+                paddle2.score += 1
+                vector = -1
+            elif self.x + LINETHICKNESS/2 >= WINDOWWIDTH:
+                paddle2.score -= 1 if paddle2.score else 0
 
         self.dir_x *= vector
 
