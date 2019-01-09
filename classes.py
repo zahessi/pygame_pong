@@ -1,6 +1,6 @@
-import pygame
+import pygame, sys
 from random import random, sample
-from pygame import QUIT, USEREVENT, K_UP, K_DOWN
+from pygame.locals import QUIT, USEREVENT, K_UP, K_DOWN
 
 FPS = 200
 
@@ -40,9 +40,9 @@ class Game:
     def setup_game(self):
         playerOnePosition = playerTwoPosition = (WINDOWHEIGHT - PADDLESIZE) / 2
 
-        paddle1 = Paddle(self.DISPLAYSURF, PADDLEOFFSET, playerOnePosition,
+        paddle1 = Paddle(self.DISPLAYSURF, (ord("w"), ord("s")), PADDLEOFFSET, playerOnePosition,
                         LINETHICKNESS, PADDLESIZE)
-        paddle2 = Paddle(self.DISPLAYSURF, WINDOWWIDTH - PADDLEOFFSET - LINETHICKNESS,
+        paddle2 = Paddle(self.DISPLAYSURF, (K_UP, K_DOWN), WINDOWWIDTH - PADDLEOFFSET - LINETHICKNESS,
                         playerTwoPosition, LINETHICKNESS, PADDLESIZE)
         ball = Ball(self.DISPLAYSURF)
         score = Score(self.DISPLAYSURF)
@@ -66,22 +66,14 @@ class Game:
             elif event.type == USEREVENT and event.paddle == 2:
                 paddle2.color = get_random_color()
 
-        if keys[ord("w")]:
-            paddle1.y -= 2
-        elif keys[ord("s")]:
-            paddle1.y += 2
-
-        if keys[K_UP]:
-            paddle2.y -= 2
-        elif keys[K_DOWN]:
-            paddle2.y += 2
+        for p in [paddle1, paddle2]:
+            p.move(keys)
 
         drawArena(self.DISPLAYSURF)
-        paddle1.draw()
-        paddle2.draw()
-        ball.draw()
-        ball.move(paddle1, paddle2)
+        for e in [paddle1, paddle2, ball]:
+            e.draw()
 
+        ball.move(paddle1, paddle2)
         score.update_score(paddle1, paddle2)
 
         pygame.display.update()
@@ -90,11 +82,20 @@ class Game:
 class Paddle(pygame.Rect):
     display = None
 
-    def __init__(self, display, *props):
+    def __init__(self, display, controls, *props):
         self.score = 0
+        self.controls = controls
         self.color = WHITE
         self.display = display
+
         pygame.Rect.__init__(self, props[0], props[1], props[2], props[3])
+
+    def move(self, keys):
+        up, down = self.controls
+        if keys[up]:
+            self.y -= 2
+        elif keys[down]:
+            self.y += 2
 
     def draw(self):
         if self.bottom > WINDOWHEIGHT - LINETHICKNESS:
