@@ -1,6 +1,6 @@
 import pygame, sys, random
 from pygame import QUIT, USEREVENT, K_UP, K_DOWN
-from classes import Paddle, Ball
+from classes import Paddle, Ball, Score
 
 FPS = 200
 
@@ -17,19 +17,6 @@ WHITE     = (255,255,255)
 
 get_random_color = lambda: tuple(random.sample(range(0, 256), 3))
 
-def displayScore(display, font, *paddles):
-    result_paddle1 = font.render(f'Score = {paddles[0].score}', True, WHITE)
-    result_paddle2 = font.render(f'Score = {paddles[1].score}', True, WHITE)
-
-    rect1 = result_paddle1.get_rect()
-    rect2 = result_paddle2.get_rect()
-    rect1.topright = (150, 50)
-    rect2.topleft = (WINDOWWIDTH - 150, 50)
-
-    display.blit(result_paddle1, rect1)
-    display.blit(result_paddle2, rect2)
-
-
 def drawArena(DISPLAYSURF):
     DISPLAYSURF.fill(BLACK)
     pygame.draw.rect(DISPLAYSURF, WHITE, ((0,0),(WINDOWWIDTH,WINDOWHEIGHT)), LINETHICKNESS*2)
@@ -38,7 +25,6 @@ def drawArena(DISPLAYSURF):
 def main():
     pygame.init()
 
-    BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH,WINDOWHEIGHT)) 
     pygame.display.set_caption('Pong')
@@ -48,6 +34,7 @@ def main():
     paddle1 = Paddle(PADDLEOFFSET,playerOnePosition, LINETHICKNESS,PADDLESIZE)
     paddle2 = Paddle(WINDOWWIDTH - PADDLEOFFSET - LINETHICKNESS, playerTwoPosition, LINETHICKNESS,PADDLESIZE)
     ball = Ball()
+    score = Score()
 
     drawArena(DISPLAYSURF)
     paddle1.draw(WHITE, DISPLAYSURF)
@@ -84,7 +71,8 @@ def main():
         ball.draw(DISPLAYSURF)   
         ball.move(paddle1, paddle2)
         
-        displayScore(DISPLAYSURF, BASICFONT, paddle1, paddle2)
+        score.update_score(DISPLAYSURF, paddle1, paddle2)
+        # displayScore(DISPLAYSURF, BASICFONT, paddle1, paddle2)
         
         pygame.display.update()
         FPSCLOCK.tick(FPS)

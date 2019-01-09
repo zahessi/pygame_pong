@@ -71,3 +71,18 @@ class Ball(pygame.Rect):
             paddle2.score -= 1 if paddle2.score else 0
 
         self.dir_x *= vector
+
+
+class Score:
+
+    def __init__(self):
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+
+    def update_score(self, display, *paddles):
+        if len(paddles) == 2:
+            for paddle in paddles:
+                result = self.font.render(f'Score = {paddle.score}', True, WHITE)
+                rect = result.get_rect()
+                rect.topright = (150, 50) if not paddles.index(paddle) else (WINDOWWIDTH - 150 + rect.width, 50)
+
+                display.blit(result, rect) 
